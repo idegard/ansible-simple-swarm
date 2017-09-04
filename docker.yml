@@ -1,0 +1,58 @@
+---
+- name: Ensure docker with secure daemon
+  hosts: docker
+  remote_user: root
+  vars_files:
+    - group_vars/docker.yml
+
+  pre_tasks:
+    - name: Ensure openssl
+      yum:
+        name: openssl
+        state: present
+        
+  roles:
+    - geerlingguy.docker
+    - role-secure-docker-daemon
+
+  post_tasks:
+    - name: Ensure docker config
+      blockinfile:
+        path: /etc/docker/daemon.json
+        marker: ""
+        create: True
+        block: |
+          {
+            "tls": true,
+            "tlscacert": "/etc/docker/ca.pem",
+            "tlscert": "/etc/docker/server-cert.pem",
+            "tlskey": "/etc/docker/server-key.pem",
+            "tlsverify": true,
+            "hosts": ["tcp://0.0.0.0:2376"],
+            "experimental": true
+          }
+        
+    - name: Ensure source docker_env
+      lineinfile:
+        path: ~/.bashrc
+        line: 'source ~/docker_env.sh'
+        
+    - name: Ensure docker restarted
+      systemd:
+        name: docker
+        state: restarted
+    
+    - name: Get CA
+      fetch:
+        src: ~/.docker/ca.pem
+        dest: certs
+    
+    - name: Get CERT
+      fetch:
+        src: ~/.docker/cert.pem
+        dest: certs
+    
+    - name: Get KEY
+      fetch:
+        src: ~/.docker/key.pem
+        dest: certs

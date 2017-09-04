@@ -1,0 +1,10 @@
+---
+- name: Ensure firewall
+  hosts: all
+  remote_user: root
+
+  tasks:
+    - name: Ensure firewalld stopped
+      systemd:
+        name: firewalld
+        state: stopped

@@ -1,0 +1,13 @@
+# from galaxy
+- src: geerlingguy.docker
+  version: "2.1.0"
+  
+- src: geerlingguy.glusterfs
+  version: "2.1.0"
+
+- src: atosatto.docker-swarm
+  version: "v1.3.2"
+
+# from GitHub
+- src: https://github.com/idegard/role-secure-docker-daemon
+  version: "v0.3"

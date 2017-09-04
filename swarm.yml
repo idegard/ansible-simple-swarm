@@ -1,0 +1,11 @@
+---
+- name: Ensure docker swarm
+  hosts: docker_swarm_manager:docker_swarm_worker
+  remote_user: root
+  vars:
+    skip_engine: true
+    skip_group: true
+    skip_docker_py: true
+    
+  roles:
+    - atosatto.docker-swarm

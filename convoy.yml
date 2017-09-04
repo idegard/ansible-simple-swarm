@@ -1,0 +1,30 @@
+---
+- name: Ensure convoy plugin for docker volumes
+  hosts: docker:&gluster
+  remote_user: root
+  vars_files:
+    - group_vars/convoy.yml
+    
+  tasks:
+    - name: Ensure convoy service exists
+      stat: path=/etc/systemd/system/convoy.service
+      register: convoy_service
+    
+    - name: Ensure convoy install script
+      get_url:
+        url: https://git.io/v50vN
+        dest: /tmp/convoy.sh
+        mode: 0755
+      when: convoy_service.stat.exists == False
+        
+    - name: Ensure convoy plugin
+      shell: /tmp/convoy.sh {{ convoy_folder }}
+      when: convoy_service.stat.exists == False
+      
+    - name: Ensure convoy started and enabled
+      systemd:
+        name: convoy
+        enabled: True
+        state: started
+        
+
